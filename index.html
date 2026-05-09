@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coreflow Gel Lab — Energiegel Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0e0f11;
+      --surface:  #16181c;
+      --surface2: #1d2025;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --text:     #e8e9eb;
+      --muted:    #8a8d94;
+      --accent:   #4ade9e;
+      --accent2:  #34b57a;
+      --danger:   #f87171;
+      --warning:  #fbbf24;
+      --radius:   10px;
+      --radius-sm: 6px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .page { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 2.5rem; padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-mark {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), #2dd4bf);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+    .logo-text p  { font-size: 12px; color: var(--muted); }
+    .version { font-size: 11px; color: var(--muted); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .metric { background: var(--surface2); border-radius: var(--radius-sm); padding: 0.85rem 1rem; }
+    .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .metric-value { font-size: 20px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .carb-tab {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border2);
+      background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .carb-tab:hover { background: var(--surface2); color: var(--text); }
+    .carb-tab.active {
+      background: rgba(74,222,158,0.12);
+      color: var(--accent);
+      border-color: rgba(74,222,158,0.3);
+    }
+
+    .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0.85rem; }
+    .slider-label { font-size: 13px; color: var(--muted); min-width: 80px; }
+    .slider-val   { font-size: 13px; font-weight: 500; min-width: 54px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    input[type=range] {
+      flex: 1; -webkit-appearance: none; height: 4px;
+      background: var(--border2); border-radius: 2px; outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(74,222,158,0.15);
+    }
+
+    select {
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border2); border-radius: var(--radius-sm);
+      padding: 5px 10px; font-size: 13px; outline: none; cursor: pointer;
+    }
+
+    .badge {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 4px; margin-left: 5px;
+      vertical-align: middle; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .badge-success { background: rgba(74,222,158,0.12); color: var(--accent); }
+    .badge-danger  { background: rgba(248,113,113,0.12); color: var(--danger); }
+    .badge-warning { background: rgba(251,191,36,0.12);  color: var(--warning); }
+    .badge-neutral { background: var(--surface2); color: var(--muted); }
+
+    .warning-banner {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-top: 1rem;
+    }
+    .warning-high   { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+    .warning-medium { background: rgba(251,191,36,0.1);  color: var(--warning); border: 1px solid rgba(251,191,36,0.2); }
+    .warn-icon { font-size: 16px; flex-shrink: 0; }
+
+    .ing-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    .ing-table th {
+      font-size: 11px; color: var(--muted); text-align: left;
+      padding: 0 0 8px; border-bottom: 1px solid var(--border);
+      font-weight: 500; letter-spacing: 0.05em;
+    }
+    .ing-table th:last-child,
+    .ing-table th:nth-last-child(2) { text-align: right; }
+    .ing-table td { padding: 9px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .ing-table tr:last-child td { border-bottom: none; }
+
+    tr.category-header td {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 14px 0 4px; border-bottom: none;
+    }
+    tr.optional-row td { opacity: 0.7; }
+    tr.total-row td {
+      border-top: 1px solid var(--border2); border-bottom: none;
+      padding-top: 12px;
+    }
+
+    .ing-name   { font-size: 13px; padding-right: 12px; }
+    .ing-notes  { font-size: 11px; color: var(--muted); padding-right: 12px; line-height: 1.5; }
+    .ing-sachet, .ing-batch { font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .protocol-list { list-style: none; counter-reset: steps; }
+    .protocol-list li {
+      counter-increment: steps;
+      display: flex; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 13px; line-height: 1.5;
+    }
+    .protocol-list li:last-child { border-bottom: none; }
+    .protocol-list li::before {
+      content: counter(steps);
+      min-width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(74,222,158,0.12); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 1px;
+    }
+
+    section { margin-bottom: 1.5rem; }
+
+    footer {
+      margin-top: 3rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--muted);
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">⚡</div>
+      <div class="logo-text">
+        <h1>Coreflow Gel Lab</h1>
+        <p>Energiegel batch calculator</p>
+      </div>
+    </div>
+    <span class="version">v1.1</span>
+  </header>
+
+  <!-- Carb level tabs -->
+  <section>
+    <div class="card-title">Koolhydraatniveau</div>
+    <div class="tab-row" id="carb-tabs"></div>
+  </section>
+
+  <!-- Controls + metrics -->
+  <section class="grid2">
+    <div class="card">
+      <div class="card-title">Batch instellen</div>
+
+      <div class="slider-row">
+        <label class="slider-label" for="batch-slider">Batchgrootte</label>
+        <input type="range" id="batch-slider" min="100" max="600" step="25" value="200"
+               oninput="onBatchChange(this.value)">
+        <span class="slider-val" id="batch-display">200 g</span>
+      </div>
+
+      <div class="slider-row">
+        <label class="slider-label" for="fruit-slider">Fruit %</label>
+        <input type="range" id="fruit-slider" min="10" max="35" step="5" value="20"
+               oninput="onFruitPctChange(this.value)">
+        <span class="slider-val" id="fruit-display">20 %</span>
+      </div>
+
+      <div class="slider-row">
+        <label class="slider-label" for="fruit-select">Fruitsoort</label>
+        <select id="fruit-select"></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Batch overzicht</div>
+      <div class="grid2" style="gap:8px;">
+        <div class="metric"><div class="metric-label">Sachets</div><div class="metric-value" id="metric-sachets">—</div></div>
+        <div class="metric"><div class="metric-label">Koolhydraten</div><div class="metric-value" id="metric-carbs">—</div></div>
+        <div class="metric"><div class="metric-label">Bereiding</div><div class="metric-value" id="metric-time">—</div></div>
+        <div class="metric"><div class="metric-label">Osmolaliteit</div><div class="metric-value" id="metric-osmo">—</div></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+        <span style="font-size:12px; color:var(--muted);">GI risico</span>
+        <span class="badge" id="gi-risk">—</span>
+      </div>
+      <div class="warning-banner" id="warning-banner" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- Ingredients table -->
+  <section class="card">
+    <div class="card-title">Ingrediënten</div>
+    <table class="ing-table">
+      <thead>
+        <tr>
+          <th>Ingrediënt</th>
+          <th>Notitie</th>
+          <th style="text-align:right;">Per sachet</th>
+          <th style="text-align:right;">Batch totaal</th>
+        </tr>
+      </thead>
+      <tbody id="ingredients-tbody"></tbody>
+    </table>
+  </section>
+
+  <!-- Protocol -->
+  <section class="card">
+    <div class="card-title">Bereidingsprotocol</div>
+    <ol class="protocol-list" id="protocol-steps"></ol>
+  </section>
+
+  <!--
+    GLUCOSE SENSOR PANEEL — activeer wanneer Coreflow vest beschikbaar is.
+    Verwijder de HTML-commentaar hieronder en uncomment de sensorcode in app.js.
+
+  <section>
+    <div class="card-title" style="margin-bottom:0.5rem;">Glucosesensor — Coreflow vest</div>
+    <div style="background:rgba(96,165,250,0.04); border:1px solid rgba(96,165,250,0.2); border-radius:var(--radius); padding:1.25rem;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <span style="font-size:13px; font-weight:500; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+          Realtime glucose
+        </span>
+        <span class="badge badge-neutral" id="sensor-status">Niet verbonden</span>
+      </div>
+      <div style="font-size:32px; font-weight:700; font-variant-numeric:tabular-nums; margin:0.5rem 0;" id="glucose-value">—</div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:0.75rem;" id="glucose-trend">—</div>
+      <div style="font-size:13px; color:#60a5fa; padding:8px 12px; background:rgba(96,165,250,0.08); border-radius:var(--radius-sm); border:1px solid rgba(96,165,250,0.15);" id="glucose-recommendation">
+        Verbind je sensor om gel-aanbevelingen te ontvangen.
+      </div>
+      <div id="glucose-auto-switch" style="display:none; margin-top:10px; padding:8px 12px; border-radius:var(--radius-sm); background:rgba(74,222,158,0.08); border:1px solid rgba(74,222,158,0.2); align-items:center; justify-content:space-between;">
+        <span class="rec-label" style="font-size:13px; color:var(--accent);">—</span>
+        <button onclick="applyRecommendedLevel()" style="padding:4px 12px; border-radius:var(--radius-sm); background:var(--accent); color:#0e0f11; border:none; cursor:pointer; font-size:12px; font-weight:600;">Toepassen</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:1rem; flex-wrap:wrap;">
+        <button onclick="connectDemoSensor()" style="padding:6px 14px; border-radius:var(--radius-sm); border:1px solid rgba(74,222,158,0.3); background:rgba(74,222,158,0.08); color:var(--accent); cursor:pointer; font-size:12px; font-weight:500;">▶ Demo starten</button>
+        <button onclick="if(sensorInstance) sensorInstance.disconnect()" style="padding:6px 14px; border-radius:var(--radius-sm); border:1px solid var(--border2); background:var(--surface2); color:var(--text); cursor:pointer; font-size:12px;">Verbreken</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <input id="sensor-endpoint" type="text" placeholder="ws://coreflow-vest.local/glucose"
+          style="flex:1; background:var(--surface2); color:var(--text); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:6px 10px; font-size:12px; font-family:monospace; outline:none;">
+        <button onclick="connectRealSensor(document.getElementById('sensor-endpoint').value)"
+          style="padding:6px 14px; border-radius:var(--radius-sm); border:1px solid var(--border2); background:var(--surface2); color:var(--text); cursor:pointer; font-size:12px;">Verbinden</button>
+      </div>
+    </div>
+  </section>
+
+  -->
+
+  <footer>
+    <span>Coreflow Gel Lab — data: <code>recipes.json</code></span>
+    <span>Sensor-integratie: zie <code>app.js → GLUCOSE SENSOR</code></span>
+  </footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
