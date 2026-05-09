@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "author": "Coreflow Gel Lab",
+    "description": "Energiegel formulas for endurance sports — scalable batch calculator",
+    "sachet_size_g": 125,
+    "density_g_per_ml": 1.25
+  },
+
+  "fruit_types": [
+    { "id": "framboos", "label": "Framboos", "natural_sugars_per_100g": 5.5, "water_pct": 0.83 },
+    { "id": "bosvrucht", "label": "Bosvrucht mix", "natural_sugars_per_100g": 6.8, "water_pct": 0.84 },
+    { "id": "kers", "label": "Kers", "natural_sugars_per_100g": 8.5, "water_pct": 0.82 }
+  ],
+
+  "carb_levels": [
+    {
+      "id": "low",
+      "label": "30g / sachet",
+      "carbs_per_sachet_g": 30,
+      "target_osmolality_mosm": 260,
+      "use_case": "Korte duur <60 min of herstelrit",
+      "gi_risk": "low"
+    },
+    {
+      "id": "medium",
+      "label": "45g / sachet",
+      "carbs_per_sachet_g": 45,
+      "target_osmolality_mosm": 340,
+      "use_case": "Standaard training 60-120 min",
+      "gi_risk": "low"
+    },
+    {
+      "id": "high",
+      "label": "60g / sachet",
+      "carbs_per_sachet_g": 60,
+      "target_osmolality_mosm": 410,
+      "use_case": "Lange duur >120 min of race",
+      "gi_risk": "medium"
+    },
+    {
+      "id": "race",
+      "label": "75g / sachet",
+      "carbs_per_sachet_g": 75,
+      "target_osmolality_mosm": 480,
+      "use_case": "Race-intensief, split in 2 sachets aanbevolen",
+      "gi_risk": "high"
+    }
+  ],
+
+  "ingredients": [
+    {
+      "id": "fruit",
+      "name": "Fruitpuree (gezeef)",
+      "category": "base",
+      "base_g_per_sachet": 25,
+      "scales_with": "fruit_pct",
+      "notes": "Diepvries → ontdooien → pureren → zeven. Weeg ná zeven.",
+      "in_stock": true,
+      "essential": true
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "category": "base",
+      "base_g_per_sachet": 65,
+      "scales_with": "inverse_carbs",
+      "notes": "Koud. Pas aan op viscositeit na hydratatie CMC.",
+      "in_stock": true,
+      "essential": true
+    },
+    {
+      "id": "maltodextrine",
+      "name": "Maltodextrine",
+      "category": "carbs",
+      "base_g_per_sachet": 22,
+      "scales_with": "carbs",
+      "ratio_of_carbs": 0.49,
+      "gi_index": 85,
+      "notes": "Glucose polymeer, langzame opname, basis van de gel.",
+      "in_stock": false,
+      "essential": true
+    },
+    {
+      "id": "dextrose",
+      "name": "Dextrose",
+      "category": "carbs",
+      "base_g_per_sachet": 10,
+      "scales_with": "carbs",
+      "ratio_of_carbs": 0.22,
+      "gi_index": 100,
+      "notes": "Snelle glucose. GLUT2 transporter.",
+      "in_stock": true,
+      "essential": true
+    },
+    {
+      "id": "trehalose",
+      "name": "Trehalose",
+      "category": "carbs",
+      "base_g_per_sachet": 8,
+      "scales_with": "carbs",
+      "ratio_of_carbs": 0.18,
+      "gi_index": 70,
+      "notes": "Langzamer opname, minder zoet. Goed voor maagcomfort.",
+      "in_stock": true,
+      "essential": false
+    },
+    {
+      "id": "fos",
+      "name": "FOS-poeder",
+      "category": "carbs",
+      "base_g_per_sachet": 2,
+      "max_g_per_sachet": 2,
+      "scales_with": "capped",
+      "notes": "Max 2g per sachet! Hogere dosis → darmklachten.",
+      "in_stock": false,
+      "essential": false
+    },
+    {
+      "id": "zeezout",
+      "name": "Zeezout",
+      "category": "electrolytes",
+      "base_g_per_sachet": 0.4,
+      "scales_with": "linear",
+      "sodium_mg_per_g": 393,
+      "notes": "~150mg Na per sachet. Kritiek voor vochtretentie.",
+      "in_stock": false,
+      "essential": true,
+      "must_buy": true
+    },
+    {
+      "id": "kaliumcitraat",
+      "name": "Kaliumcitraat",
+      "category": "electrolytes",
+      "base_g_per_sachet": 0.25,
+      "scales_with": "linear",
+      "potassium_mg_per_g": 308,
+      "notes": "~80mg K per sachet. Voorkomt krampen.",
+      "in_stock": true,
+      "essential": true
+    },
+    {
+      "id": "citroenzuur",
+      "name": "Citroenzuur",
+      "category": "flavor",
+      "base_g_per_sachet": 0.3,
+      "scales_with": "linear",
+      "notes": "Verlaagt pH. Streef pH 3.2–3.8.",
+      "in_stock": true,
+      "essential": true
+    },
+    {
+      "id": "appelzuur",
+      "name": "Appelzuur",
+      "category": "flavor",
+      "base_g_per_sachet": 0.1,
+      "scales_with": "linear",
+      "notes": "Rondt het zuurtje af, minder scherp dan citroenzuur.",
+      "in_stock": true,
+      "essential": false
+    },
+    {
+      "id": "vitaminec",
+      "name": "Vitamine C",
+      "category": "flavor",
+      "base_g_per_sachet": 0.1,
+      "scales_with": "linear",
+      "notes": "Antioxidant + kleine zuurkorrel. Max 0.2g/sachet.",
+      "in_stock": true,
+      "essential": false
+    },
+    {
+      "id": "cmc",
+      "name": "CMC (carboxymethylcellulose)",
+      "category": "texture",
+      "base_g_per_sachet": 0.4,
+      "scales_with": "linear",
+      "notes": "ALTIJD als laatste toevoegen! Langzaam instrooien onder roeren. 10-15 min laten hydrateren.",
+      "in_stock": false,
+      "essential": true,
+      "must_buy": true
+    },
+    {
+      "id": "lecithin",
+      "name": "Sunflower Lecithin",
+      "category": "texture",
+      "base_g_per_sachet": 0.2,
+      "scales_with": "linear",
+      "notes": "Emulgeert vetten uit fruit. Toevoegen vóór CMC.",
+      "in_stock": true,
+      "essential": false
+    }
+  ],
+
+  "protocol": [
+    { "step": 1, "title": "Fruit voorbereiden", "detail": "Diepvriesfruit ontdooien, pureren en door fijne zeef drukken. Weeg de gezeefde puree — dit is je fruitbasis." },
+    { "step": 2, "title": "Droge mix", "detail": "Meng alle poeders droog: maltodextrine, dextrose, trehalose, FOS, elektrolyten, zuren, vitamine C. CMC apart houden!" },
+    { "step": 3, "title": "Vloeistoffase", "detail": "Combineer fruitpuree + water in mengbeker. Voeg lecithin toe en mix kort met staafmixer." },
+    { "step": 4, "title": "Combineren", "detail": "Voeg droge mix geleidelijk toe aan vloeistof onder continu roeren." },
+    { "step": 5, "title": "CMC toevoegen", "detail": "Strooi CMC langzaam in terwijl je mixt. Nooit in één keer — voorkomt klonters!" },
+    { "step": 6, "title": "Quellen", "detail": "Laat 10-15 minuten staan. CMC hydrateert, viscositeit stabiliseert." },
+    { "step": 7, "title": "Afstellen", "detail": "Proef. Te dik → 5-10g water. Te dun → volgende batch +0.05g CMC. Check pH: streef 3.2–3.8." },
+    { "step": 8, "title": "Afvullen", "detail": "Vul sachets via trechter of doseerspuit. Sluit luchtdicht, label met datum + variant. Koelen of invriezen." }
+  ],
+
+  "glucose_sensor": {
+    "enabled": false,
+    "api_endpoint": null,
+    "notes": "Reserveer dit object voor Coreflow vest glucosesensor integratie. Zie glucose-sensor.js voor de koppeling.",
+    "expected_fields": {
+      "glucose_mmol": "number — huidige bloedglucose in mmol/L",
+      "trend": "string — 'rising' | 'stable' | 'falling' | 'rapid_rise' | 'rapid_fall'",
+      "timestamp_iso": "string — ISO 8601",
+      "device_id": "string"
+    },
+    "thresholds": {
+      "low_alert_mmol": 3.9,
+      "target_min_mmol": 5.0,
+      "target_max_mmol": 8.0,
+      "high_alert_mmol": 10.0
+    },
+    "gel_recommendation_logic": "Als glucose < 5.0 mmol/L tijdens inspanning → aanbeveel hogere carb-variant. Als glucose > 8.0 → aanbeveel lagere variant of wacht."
+  }
+}
